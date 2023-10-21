@@ -42,12 +42,12 @@ async function run() {
     // create data
     app.post('/cars',async (req, res)=>{
       const newCars = req.body
-      const result = await CarCollection.insertMany(newCars)
+      const result = await CarCollection.insertOne(newCars)
       res.send(result)
     })
 
      // get data by id
-     app.get('/car/:id', async(req, res) =>{
+     app.get('/cars/:id', async(req, res) =>{
       const id = req.params.id
       const query = {_id: new ObjectId(id)}
       const result = await CarCollection.findOne(query)
@@ -55,11 +55,32 @@ async function run() {
     })
 
     // get data by brand name
-    app.get('/cars/:brandName', async(req, res) =>{
+    app.get('/car/:brandName', async(req, res) =>{
       const brandNames = req.params.brandName
-      const query = {brand_name: brandNames.toLowerCase()}
+      const query = {brand_name: brandNames}
       const cursor = CarCollection.find(query);
       const result = await cursor.toArray();
+      res.send(result)
+    })
+
+    // update data
+    app.put('/cars/:id', async(req, res) =>{
+      const id = req.params.id
+      const filter = {_id: new ObjectId(id)}
+      const options = { upsert: true };
+      const updateCar = req.body;
+      const car = {
+        $set: {
+          name:updateCar.name,
+          brand_name:updateCar.brand_name,
+          type:updateCar.type, 
+          price:updateCar.price,
+          description:updateCar.description,
+          photo:updateCar.photo,
+          rating:updateCar.rating
+        },
+      }
+      const result = await CarCollection.updateOne(filter,car,options)
       res.send(result)
     })
 
@@ -90,29 +111,8 @@ async function run() {
       const result = await cartCollection.deleteOne(query)
       res.send(result)
     })
- 
+     
 
-       
-    // update data
-    app.put('/cars/:id', async(req, res) =>{
-      const id = req.params.id
-      const filter = {_id: new ObjectId(id)}
-      const options = { upsert: true };
-      const updateCar = req.body;
-      const car = {
-        $set: {
-          name:updateCar.name,
-          brand_name:updateCar.brand_name,
-          type:updateCar.type, 
-          price:updateCar.price,
-          description:updateCar.description,
-          photo:updateCar.photo,
-          rating:updateCar.rating
-        },
-      }
-      const result = await CarCollection.updateOne(filter,car,options)
-      res.send(result)
-    })
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
