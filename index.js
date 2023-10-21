@@ -47,10 +47,19 @@ async function run() {
     })
 
      // get data by id
-     app.get('/cars/:id', async(req, res) =>{
+     app.get('/car/:id', async(req, res) =>{
       const id = req.params.id
       const query = {_id: new ObjectId(id)}
       const result = await CarCollection.findOne(query)
+      res.send(result)
+    })
+
+    // get data by brand name
+    app.get('/cars/:brandName', async(req, res) =>{
+      const brandNames = req.params.brandName
+      const query = {brand_name: brandNames.toLowerCase()}
+      const cursor = CarCollection.find(query);
+      const result = await cursor.toArray();
       res.send(result)
     })
 
@@ -69,7 +78,7 @@ async function run() {
 
     app.get('/carts/:id', async(req, res) =>{
       const id = req.params.id
-      const query = {_id: id}
+      const query = {_id: new ObjectId(id)}
       const result = await cartCollection.findOne(query)
       res.send(result)
     })
@@ -77,7 +86,7 @@ async function run() {
     // delete from add cart
     app.delete('/carts/:id', async(req, res) =>{
       const id = req.params.id
-      const query = {_id: id}
+      const query = {_id: new ObjectId(id)}
       const result = await cartCollection.deleteOne(query)
       res.send(result)
     })
